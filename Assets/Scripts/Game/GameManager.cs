@@ -51,19 +51,7 @@ namespace Mine.Game
                 // Apply buffs
                 if (withBuffs)
                 {
-                    var settings = data.settings;
-                    Assert.IsTrue(settings.buffCountMin <= settings.buffCountMax, "Incorrect buff count");
-
-                    int count = UnityEngine.Random.Range(settings.buffCountMin, settings.buffCountMax + 1);
-
-                    // Choose
-                    IEnumerable<Buff> buffs;
-                    if (settings.allowDuplicateBuffs)
-                        buffs = Enumerable.Repeat(0, count).Select(_ => data.buffs.RandomValue());
-                    else
-                        buffs = data.buffs.OrderBy(_ => UnityEngine.Random.value).Take(count);
-
-                    // Apply
+                    var buffs = GetBuffs();
                     foreach (var buff in buffs)
                     {
                         player.ApplyBuff(buff);
@@ -135,6 +123,23 @@ namespace Mine.Game
         private Player GetEnemy(int playerId)
         {
             return this.players.FirstOrDefault(p => p.PlayerId != playerId);
+        }
+
+        private IEnumerable<Buff> GetBuffs()
+        {
+            var data = loadManager.GameData;
+            var settings = data.settings;
+            Assert.IsTrue(settings.buffCountMin <= settings.buffCountMax, "Incorrect buff count");
+
+            int count = UnityEngine.Random.Range(settings.buffCountMin, settings.buffCountMax + 1);
+
+            IEnumerable<Buff> buffs;
+            if (settings.allowDuplicateBuffs)
+                buffs = Enumerable.Repeat(0, count).Select(_ => data.buffs.RandomValue());
+            else
+                buffs = data.buffs.OrderBy(_ => UnityEngine.Random.value).Take(count);
+
+            return buffs;
         }
     }
 }
