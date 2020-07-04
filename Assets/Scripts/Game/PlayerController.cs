@@ -119,8 +119,7 @@ namespace Mine.Game
             this.panel.character.SetInteger("Health", Mathf.CeilToInt(player.GetHealth()));
 
             // Subscribe
-            player.onTakeDamage += OnTakeDamage;
-            player.onHeal += OnHeal;
+            player.onStatsChanged += OnStatsChanged;
         }
 
         private void OnAttackClick()
@@ -133,17 +132,7 @@ namespace Mine.Game
             gameManager.DealDamage(this.playerId);
         }
 
-        private void OnTakeDamage()
-        {
-            UpdateStats();
-        }
-
-        private void OnHeal()
-        {
-            UpdateStats();
-        }
-
-        private void UpdateStats()
+        private void OnStatsChanged()
         {
             var player = this.currentPlayer;
             var stats = player.GetStats();
@@ -195,8 +184,7 @@ namespace Mine.Game
         {
             if (currentPlayer != null)
             {
-                currentPlayer.onTakeDamage -= OnTakeDamage;
-                currentPlayer.onHeal -= OnHeal;
+                currentPlayer.onStatsChanged -= OnStatsChanged;
                 currentPlayer = null;
             }
         }
