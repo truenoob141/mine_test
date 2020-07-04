@@ -22,6 +22,8 @@ namespace Mine
 
         public override void InstallBindings()
         {
+            Container.BindInterfacesAndSelfTo<EventManager>().AsSingle();
+
             Container.BindInterfacesAndSelfTo<PoolCleanupChecker>().AsSingle();
         }
     }
