@@ -58,14 +58,19 @@ namespace Mine.Game
             Buff playerBuff;
             if (!buffs.TryGetValue(buff.id, out playerBuff))
             {
-                // Don't use new, because buff is immutable
+                // TODO Clone
                 playerBuff = new Buff
                 {
                     id = buff.id,
                     icon = buff.icon,
                     title = buff.title,
-                    stats = buff.stats.Select(s => new BuffStat { statId = s.statId }).ToArray()
+                    stats = new BuffStat[buff.stats.Length]
                 };
+
+                for (int i = 0; i < playerBuff.stats.Length; ++i)
+                {
+                    playerBuff.stats[i] = new BuffStat { statId = buff.stats[i].statId };
+                }
 
                 buffs.Add(buff.id, playerBuff);
             }
