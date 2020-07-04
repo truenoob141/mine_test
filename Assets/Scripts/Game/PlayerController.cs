@@ -134,7 +134,7 @@ namespace Mine.Game
         private void OnPlayerStatsChanged(OnPlayerStatsChanged ev)
         {
             var player = this.currentPlayer;
-            if (player == null || player.PlayerId != ev.PlayerId)
+            if (player == null || player.EntityId != ev.Id)
                 return;
 
             var stats = player.GetStats();

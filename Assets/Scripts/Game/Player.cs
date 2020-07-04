@@ -6,9 +6,9 @@ using UnityEngine.Assertions;
 
 namespace Mine.Game
 {
-    public class Player
+    public class Player : IVictim, IAttacker
     {
-        public int PlayerId { get; private set; }
+        public int EntityId { get; private set; }
 
         private ProjectInstaller.Settings settings;
 
@@ -17,7 +17,7 @@ namespace Mine.Game
 
         public Player(int playerId, ProjectInstaller.Settings settings)
         {
-            this.PlayerId = playerId;
+            this.EntityId = playerId;
             this.settings = settings;
         }
 
@@ -74,7 +74,7 @@ namespace Mine.Game
             else
             {
                 // Just debug
-                Debug.Log($"Player {PlayerId} has a duplicate buff {buff.title} ({buff.id})");
+                Debug.Log($"Player {EntityId} has a duplicate buff {buff.title} ({buff.id})");
             }
 
             // Mutable buffs or duplicate buff id
@@ -115,17 +115,7 @@ namespace Mine.Game
             return stats[settings.healthId].value;
         }
 
-        public float GetDamage()
-        {
-            return stats[settings.damageId].value;
-        }
-
-        public float GetLifesteal()
-        {
-            return stats[settings.lifestealId].value * 0.01f;
-        }
-
-        /// <returns>Final damage amount</returns>
+        #region IVictim
         public float TakeDamage(float amount)
         {
             Assert.IsTrue(amount > 0);
@@ -139,12 +129,33 @@ namespace Mine.Game
             var health = stats[settings.healthId];
             health.value = Mathf.Max(0, health.value - damage);
 
-            Debug.Log($"Player {PlayerId} take {damage} damage (health {health.value})");
+            Debug.Log($"Player {EntityId} take {damage} damage (health {health.value})");
 
             return damage;
         }
 
-        public void Heal(float amount)
+        public bool IsAlive()
+        {
+            var health = GetHealth();
+            return health > 0;
+        }
+        #endregion
+
+        #region IAttacker
+        public float GetDamage()
+        {
+            return stats[settings.damageId].value;
+        }
+
+        public void DealDamage(float damage)
+        {
+            float lifesteal = stats[settings.lifestealId].value * 0.01f;
+            if (lifesteal > 0)
+                Heal(lifesteal * damage);
+        }
+        #endregion
+
+        private void Heal(float amount)
         {
             // Ignore max health ?
 
@@ -153,13 +164,7 @@ namespace Mine.Game
             var health = stats[settings.healthId];
             health.value += amount;
 
-            Debug.Log($"Heal player {PlayerId} to {amount} (health {health.value})");
-        }
-
-        public bool IsAlive()
-        {
-            var health = GetHealth();
-            return health > 0;
+            Debug.Log($"Heal player {EntityId} to {amount} (health {health.value})");
         }
     }
 }

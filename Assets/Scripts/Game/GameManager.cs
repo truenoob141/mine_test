@@ -11,11 +11,11 @@ namespace Mine.Game
 
     public class OnPlayerStatsChanged
     {
-        public int PlayerId { get; private set; }
+        public int Id { get; private set; }
 
-        public OnPlayerStatsChanged(int playerId)
+        public OnPlayerStatsChanged(int id)
         {
-            this.PlayerId = playerId;
+            this.Id = id;
         }
     }
 
@@ -91,12 +91,12 @@ namespace Mine.Game
         {
             Assert.IsTrue(attackerId > 0, "Invalid player id");
 
-            var victim = GetEnemy(attackerId);
+            IVictim victim = GetEnemy(attackerId);
             // Victim already dead
             if (!victim.IsAlive())
                 return;
 
-            var attacker = GetPlayer(attackerId);
+            IAttacker attacker = GetPlayer(attackerId);
 
             // Deal damage
             float damage = attacker.GetDamage();
@@ -105,14 +105,12 @@ namespace Mine.Game
 
             damage = victim.TakeDamage(damage);
 
-            // Lifesteal
-            float lifesteal = attacker.GetLifesteal();
-            if (lifesteal > 0)
-                attacker.Heal(lifesteal * damage);
+            // Attacker
+            attacker.DealDamage(damage);
 
             // Events
-            eventManager.Trigger(new OnPlayerStatsChanged(victim.PlayerId));
-            eventManager.Trigger(new OnPlayerStatsChanged(attacker.PlayerId));
+            eventManager.Trigger(new OnPlayerStatsChanged(victim.EntityId));
+            eventManager.Trigger(new OnPlayerStatsChanged(attacker.EntityId));
 
             // Game over
             bool isAlive = victim.IsAlive();
@@ -125,7 +123,7 @@ namespace Mine.Game
         public Player GetPlayer(int playerId)
         {
             // TODO I can use dictionary, but no
-            return this.players.FirstOrDefault(p => p.PlayerId == playerId);
+            return this.players.FirstOrDefault(p => p.EntityId == playerId);
         }
 
         private void OnGameLoaded()
@@ -136,7 +134,7 @@ namespace Mine.Game
 
         private Player GetEnemy(int playerId)
         {
-            return this.players.FirstOrDefault(p => p.PlayerId != playerId);
+            return this.players.FirstOrDefault(p => p.EntityId != playerId);
         }
 
         private IEnumerable<Buff> GetBuffs()
