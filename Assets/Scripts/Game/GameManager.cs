@@ -9,6 +9,16 @@ namespace Mine.Game
 {
     public class OnGameStarted { }
 
+    public class OnPlayerStatsChanged
+    {
+        public int PlayerId { get; private set; }
+
+        public OnPlayerStatsChanged(int playerId)
+        {
+            this.PlayerId = playerId;
+        }
+    }
+
     public class GameManager : IInitializable, IDisposable
     {
         [Inject] private EventManager eventManager;
@@ -99,6 +109,10 @@ namespace Mine.Game
             float lifesteal = attacker.GetLifesteal();
             if (lifesteal > 0)
                 attacker.Heal(lifesteal * damage);
+
+            // Events
+            eventManager.Trigger(new OnPlayerStatsChanged(victim.PlayerId));
+            eventManager.Trigger(new OnPlayerStatsChanged(attacker.PlayerId));
 
             // Game over
             bool isAlive = victim.IsAlive();

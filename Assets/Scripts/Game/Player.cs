@@ -10,8 +10,6 @@ namespace Mine.Game
     {
         public int PlayerId { get; private set; }
 
-        public event Action onStatsChanged;
-
         private ProjectInstaller.Settings settings;
 
         private Dictionary<int, Stat> stats = new Dictionary<int, Stat>();
@@ -143,9 +141,6 @@ namespace Mine.Game
 
             Debug.Log($"Player {PlayerId} take {damage} damage (health {health.value})");
 
-            // Event
-            onStatsChanged?.Invoke();
-
             return damage;
         }
 
@@ -159,9 +154,6 @@ namespace Mine.Game
             health.value += amount;
 
             Debug.Log($"Heal player {PlayerId} to {amount} (health {health.value})");
-
-            // Event
-            onStatsChanged?.Invoke();
         }
 
         public bool IsAlive()

@@ -38,6 +38,7 @@ namespace Mine.Game
             this.panel = GetComponent<PlayerPanelHierarchy>();
 
             eventManager.Subscribe<OnGameStarted>(OnGameStarted);
+            eventManager.Subscribe<OnPlayerStatsChanged>(OnPlayerStatsChanged);
 
             this.panel.attackButton.onClick.AddListener(OnAttackClick);
         }
@@ -45,6 +46,7 @@ namespace Mine.Game
         private void OnDestroy()
         {
             eventManager.Unsubscribe<OnGameStarted>(OnGameStarted);
+            eventManager.Unsubscribe<OnPlayerStatsChanged>(OnPlayerStatsChanged);
 
             this.panel.attackButton.onClick.RemoveListener(OnAttackClick);
 
@@ -117,9 +119,6 @@ namespace Mine.Game
 
             // Apply health to animator
             this.panel.character.SetInteger("Health", Mathf.CeilToInt(player.GetHealth()));
-
-            // Subscribe
-            player.onStatsChanged += OnStatsChanged;
         }
 
         private void OnAttackClick()
@@ -132,9 +131,12 @@ namespace Mine.Game
             gameManager.DealDamage(this.playerId);
         }
 
-        private void OnStatsChanged()
+        private void OnPlayerStatsChanged(OnPlayerStatsChanged ev)
         {
             var player = this.currentPlayer;
+            if (player == null || player.PlayerId != ev.PlayerId)
+                return;
+
             var stats = player.GetStats();
             foreach (var view in this.statViews)
             {
@@ -182,11 +184,7 @@ namespace Mine.Game
 
         private void ResetCurrentPlayer()
         {
-            if (currentPlayer != null)
-            {
-                currentPlayer.onStatsChanged -= OnStatsChanged;
-                currentPlayer = null;
-            }
+            currentPlayer = null;
         }
     }
 }
