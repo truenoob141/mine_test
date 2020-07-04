@@ -23,6 +23,7 @@ namespace Mine
         public override void InstallBindings()
         {
             Container.BindInterfacesAndSelfTo<EventManager>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GameManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<LoadManager>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<PoolCleanupChecker>().AsSingle();
